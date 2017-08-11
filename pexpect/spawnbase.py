@@ -1,3 +1,4 @@
+from StringIO import StringIO
 import codecs
 import os
 import sys
@@ -58,7 +59,7 @@ class SpawnBase(object):
         # max bytes to read at one time into buffer
         self.maxread = maxread
         # This is the read buffer. See maxread.
-        self.buffer = bytes() if (encoding is None) else text_type()
+        self.buffer = StringIO()
         # Data before searchwindowsize point is preserved, but not searched.
         self.searchwindowsize = searchwindowsize
         # Delay used before sending data to child. Time in seconds.
@@ -339,7 +340,7 @@ class SpawnBase(object):
         if timeout == -1:
             timeout = self.timeout
 
-        exp = Expecter(self, searcher_re(pattern_list), searchwindowsize)
+        exp = Expecter(self, pattern_list, searchwindowsize)
         if async:
             from .async import expect_async
             return expect_async(exp, timeout)
@@ -384,7 +385,7 @@ class SpawnBase(object):
             self._pattern_type_err(pattern_list)
         pattern_list = [prepare_pattern(p) for p in pattern_list]
 
-        exp = Expecter(self, searcher_string(pattern_list), searchwindowsize)
+        exp = Expecter(self, pattern_list, searchwindowsize)
         if async:
             from .async import expect_async
             return expect_async(exp, timeout)
